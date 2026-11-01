@@ -30,3 +30,4 @@ iPhone application for [heartivelovestv.pages.dev](https://heartivelovestv.pages
 3. Open your repo on GitHub and click the **Actions** tab.
 4. When the build finishes, download **`Heartive-ipa`** (contains `Heartive.ipa`) from **Artifacts**.
 5. Drag into **Sideloadly** and install on your iPhone.
+

@@ -17,7 +17,6 @@ struct WebViewContainer: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
         webView.scrollView.bounces = true
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.backgroundColor = UIColor(red: 0.035, green: 0.035, blue: 0.051, alpha: 1.0)
         webView.isOpaque = false
         webView.allowsBackForwardNavigationGestures = true
@@ -49,14 +48,22 @@ struct WebViewContainer: UIViewRepresentable {
             parent.canGoForward = webView.canGoForward
             parent.currentURL = webView.url
             
-            // Inject styling and smooth theme tweaks
+            // Seamlessly hide duplicate web navigation bar so the native bottom bar is the single clean bar
             let js = """
-            document.documentElement.style.webkitTouchCallout = 'none';
-            document.documentElement.style.webkitUserSelect = 'none';
-            var meta = document.querySelector('meta[name="viewport"]');
-            if (meta) {
-                meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-            }
+            (function() {
+                var style = document.createElement('style');
+                style.innerHTML = `
+                    .tabbar { display: none !important; }
+                    body { padding-bottom: 0 !important; }
+                    #view { padding-bottom: 24px !important; }
+                `;
+                document.head.appendChild(style);
+                
+                var meta = document.querySelector('meta[name="viewport"]');
+                if (meta) {
+                    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+                }
+            })();
             """
             webView.evaluateJavaScript(js, completionHandler: nil)
         }
@@ -69,7 +76,6 @@ struct WebViewContainer: UIViewRepresentable {
             parent.isLoading = false
         }
         
-        // Support video full-screen playback and popups
         func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
             if navigationAction.targetFrame == nil {
                 webView.load(navigationAction.request)
