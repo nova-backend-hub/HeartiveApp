@@ -5,6 +5,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-14
@@ -40,4 +43,13 @@ jobs:
         name: Heartive-ipa
         path: Heartive.ipa
         retention-days: 14
+
+    - name: Publish Release IPA
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.1.0
+        name: Heartive iOS v1.1.0
+        body: "Heartive iPhone app connected to Heartive TV (`192.168.1.115:5400`) for one-tap TV playback and remote control."
+        files: Heartive.ipa
+        make_latest: true
 
